@@ -1,13 +1,23 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
 
 
 Console.WriteLine("Welcome to the ConConverter");
 
+
 // The Con workbook beeing read
-XLWorkbook wbIn = new XLWorkbook("C:\\Users\\tguiv\\OneDrive\\Desktop\\New folder\\DAS 18639.XLSX");
+string InPath = "C:\\Users\\tguiv\\OneDrive\\Desktop\\New folder\\DAS 18639.XLSX"; //default file for debugging
+if (args.Count() != 0) //should the default during normal use
+{
+    Console.WriteLine("Opening " + args[0].ToString());
+    InPath = args[0].ToString();
+}
+
+
+Console.WriteLine("Opening the Concession XLSX ");
+XLWorkbook wbIn = new XLWorkbook(new FileStream(InPath,FileMode.Open,FileAccess.Read,FileShare.Read));
+
 int ConLineCount = CountLines(wbIn);
 
 Console.WriteLine("Opened the Concession and found " + ConLineCount.ToString() + " lines" );
@@ -22,9 +32,14 @@ Headers(wbOut);
 ConSheet(wbIn, wbOut, ConLineCount);
 ContinuationSheet(wbIn, wbOut, ConLineCount);
 
-
+Console.WriteLine("Done with the Data, saving the file");
 //saving the new workbook
-wbOut.SaveAs("C:\\Users\\tguiv\\OneDrive\\Desktop\\New folder\\out.XLSX");
+wbOut.SaveAs("out.XLSX");
+
+
+Console.WriteLine("Done");
+
+Thread.Sleep(3000);
 
 static void ContinuationSheet(XLWorkbook wb, XLWorkbook wbout, int ConLineCount)
 {
