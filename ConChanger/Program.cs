@@ -2,51 +2,71 @@
 
 internal class Program
 {
-    private static void Main(string[] args)
+    static class Globals
     {
-        Console.WriteLine("Welcome to the ConConverter");
-
+        public static string FilePath = "\"out.XLSX\""  ;
+    }
+        private static void Main(string[] args)
+    {
+         
+    Console.WriteLine("Welcome to the ConConverter");
 
         // The Con workbook beeing read
         string InPath = "C:\\Users\\tguiv\\OneDrive\\Desktop\\New folder\\DAS 18639.XLSX"; //default file for debugging
-        if (args.Count() != 0) //takes a file that is droped onto the .exe, should the default during normal use
+        if (args.Count() != 0) //takes a file that is droped onto the .exe, should be the default during normal use
         {
             Console.WriteLine("Opening " + args[0].ToString());
             InPath = args[0].ToString();
         }
-
-
+        Body(InPath);
+    }
+    private static void Body(string InPath)
+    {
         Console.WriteLine("Opening the Concession XLSX ");
         XLWorkbook wbIn = new XLWorkbook(new FileStream(InPath, FileMode.Open, FileAccess.Read, FileShare.Read));
 
-        int ConLineCount = CountLines(wbIn);
+        int ConLineCount = CountLinesInCon(wbIn);
 
         Console.WriteLine("Opened the Concession and found " + ConLineCount.ToString() + " lines");
 
+        var wbOut = GetWorkBook(); //get refference to the out workbook
+        var wbOutLineCount = CountLinesOutBook(wbOut);
 
-        // create new workbook to put the rearanged data into
-        var wbOut = new XLWorkbook();
-        wbOut.AddWorksheet();
-
-        // do all the work moving data
         Headers(wbOut);
         ConSheet(wbIn, wbOut, ConLineCount);
         ContinuationSheet(wbIn, wbOut, ConLineCount);
 
         Console.WriteLine("Done with the Data, saving the file");
-        wbOut.SaveAs("out.XLSX");
-
+        wbOut.SaveAs(Globals.FilePath);
 
         Console.WriteLine("Done");
 
         // leave the terminal window open for 3s
         Thread.Sleep(3000);
+    }
+
+    private static int CountLinesOutBook(XLWorkbook wbOut)
+    {
+        throw new NotImplementedException();
+    }
+
+    private static XLWorkbook GetWorkBook()
+    {
+        if (File.Exists(Globals.FilePath)) 
+            {return new XLWorkbook(Globals.FilePath);}
+        else
+        {
+            var wbOut = new XLWorkbook();
+            wbOut.AddWorksheet();
+            return wbOut;
+        }
+    }
 
         // Moving the data off the continuation sheet
-        static void ContinuationSheet(XLWorkbook wb, XLWorkbook wbout, int ConLineCount)
+        static void ContinuationSheet(XLWorkbook wbin, XLWorkbook wbout, int ConLineCount)
         {
             IXLWorksheet WSout = wbout.Worksheets.First();
-            IXLWorksheet ContSheet = wb.Worksheet(3);
+            IXLWorksheet ContSheet = wbin.Worksheet(3);
             string ContSheetName = "Continuation Sheet";
             if (ContSheet.Name != ContSheetName) { throw new ArgumentException("The continuation sheet wasnt found"); }
 
@@ -146,7 +166,7 @@ internal class Program
         }
 
         // count the number of lines in the concession
-        static int CountLines(XLWorkbook wb)
+        static int CountLinesInCon(XLWorkbook wb)
         {
             string ContSheetName = "Continuation Sheet";
             IXLWorksheet ContSheet = wb.Worksheet(3);
@@ -160,5 +180,5 @@ internal class Program
 
             return 0;
         }
-    }
+    
 }
