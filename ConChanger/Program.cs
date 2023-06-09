@@ -4,7 +4,7 @@ internal class Program
 {
     static class Globals
     {
-        public static string FilePath = "\"out.XLSX\""  ;
+        public static string FilePath = "out.xlsx"  ;
     }
         private static void Main(string[] args)
     {
@@ -33,8 +33,8 @@ internal class Program
         var wbOutLineCount = CountLinesOutBook(wbOut);
 
         Headers(wbOut);
-        ConSheet(wbIn, wbOut, ConLineCount);
-        ContinuationSheet(wbIn, wbOut, ConLineCount);
+        ConSheet(wbIn, wbOut, ConLineCount, wbOutLineCount);
+        ContinuationSheet(wbIn, wbOut, ConLineCount, wbOutLineCount);
 
         Console.WriteLine("Done with the Data, saving the file");
         wbOut.SaveAs(Globals.FilePath);
@@ -47,7 +47,12 @@ internal class Program
 
     private static int CountLinesOutBook(XLWorkbook wbOut)
     {
-        throw new NotImplementedException();
+        IXLWorksheet WSOut = wbOut.Worksheets.First();
+        IXLCells UsedCells = WSOut.CellsUsed();
+        if (UsedCells.Count() == 0) { return UsedCells.Count(); }
+
+        return UsedCells.Last().Address.RowNumber;
+
     }
 
     private static XLWorkbook GetWorkBook()
@@ -63,62 +68,62 @@ internal class Program
     }
 
         // Moving the data off the continuation sheet
-        static void ContinuationSheet(XLWorkbook wbin, XLWorkbook wbout, int ConLineCount)
+        static void ContinuationSheet(XLWorkbook wbin, XLWorkbook wbout, int ConLineCount,int OutBookLineCount)
         {
             IXLWorksheet WSout = wbout.Worksheets.First();
             IXLWorksheet ContSheet = wbin.Worksheet(3);
             string ContSheetName = "Continuation Sheet";
             if (ContSheet.Name != ContSheetName) { throw new ArgumentException("The continuation sheet wasnt found"); }
 
-            ContSheet.Range(4, 2, ConLineCount + 3, 2).CopyTo(WSout.Cell(2, 20)); // Item No.
-            ContSheet.Range(4, 3, ConLineCount + 3, 3).CopyTo(WSout.Cell(2, 21));// Defect Location Code Group
-            ContSheet.Range(4, 6, ConLineCount + 3, 6).CopyTo(WSout.Cell(2, 22)); // Defect Location Code Description
-            ContSheet.Range(4, 7, ConLineCount + 3, 7).CopyTo(WSout.Cell(2, 23)); // Defect Type Code Group
-            ContSheet.Range(4, 9, ConLineCount + 3, 9).CopyTo(WSout.Cell(2, 24)); //"Defect Type Code Description"
-            ContSheet.Range(4, 10, ConLineCount + 3, 10).CopyTo(WSout.Cell(2, 25)); //"Cause Type Code Group"
-            ContSheet.Range(4, 12, ConLineCount + 3, 12).CopyTo(WSout.Cell(2, 26)); //"Casue Type Code Description"
-            ContSheet.Range(4, 15, ConLineCount + 3, 15).CopyTo(WSout.Cell(2, 27)); //"Zone"
-            ContSheet.Range(4, 16, ConLineCount + 3, 16).CopyTo(WSout.Cell(2, 28)); //"Sheet"
-            ContSheet.Range(4, 17, ConLineCount + 3, 17).CopyTo(WSout.Cell(2, 29)); //"Nominal"
-            ContSheet.Range(4, 18, ConLineCount + 3, 18).CopyTo(WSout.Cell(2, 30)); //"Toll(-)"
-            ContSheet.Range(4, 19, ConLineCount + 3, 19).CopyTo(WSout.Cell(2, 31)); //Toll(+)
-            ContSheet.Range(4, 20, ConLineCount + 3, 20).CopyTo(WSout.Cell(2, 32)); //Actual
-            ContSheet.Range(4, 21, ConLineCount + 3, 21).CopyTo(WSout.Cell(2, 33)); //"Extent Of Variation"
-            ContSheet.Range(4, 22, ConLineCount + 3, 22).CopyTo(WSout.Cell(2, 34)); //"Comments Short"
-            ContSheet.Range(4, 24, ConLineCount + 3, 24).CopyTo(WSout.Cell(2, 35)); //"Comments Long"
+            ContSheet.Range(4, 2, ConLineCount + 3, 2).CopyTo(WSout.Cell(OutBookLineCount + 2, 20)); // Item No.
+            ContSheet.Range(4, 3, ConLineCount + 3, 3).CopyTo(WSout.Cell(OutBookLineCount + 2, 21));// Defect Location Code Group
+            ContSheet.Range(4, 6, ConLineCount + 3, 6).CopyTo(WSout.Cell(OutBookLineCount + 2, 22)); // Defect Location Code Description
+            ContSheet.Range(4, 7, ConLineCount + 3, 7).CopyTo(WSout.Cell(OutBookLineCount + 2, 23)); // Defect Type Code Group
+            ContSheet.Range(4, 9, ConLineCount + 3, 9).CopyTo(WSout.Cell(OutBookLineCount + 2, 24)); //"Defect Type Code Description"
+            ContSheet.Range(4, 10, ConLineCount + 3, 10).CopyTo(WSout.Cell(OutBookLineCount + 2, 25)); //"Cause Type Code Group"
+            ContSheet.Range(4, 12, ConLineCount + 3, 12).CopyTo(WSout.Cell(OutBookLineCount + 2, 26)); //"Casue Type Code Description"
+            ContSheet.Range(4, 15, ConLineCount + 3, 15).CopyTo(WSout.Cell(OutBookLineCount + 2, 27)); //"Zone"
+            ContSheet.Range(4, 16, ConLineCount + 3, 16).CopyTo(WSout.Cell(OutBookLineCount + 2, 28)); //"Sheet"
+            ContSheet.Range(4, 17, ConLineCount + 3, 17).CopyTo(WSout.Cell(OutBookLineCount + 2, 29)); //"Nominal"
+            ContSheet.Range(4, 18, ConLineCount + 3, 18).CopyTo(WSout.Cell(OutBookLineCount + 2, 30)); //"Toll(-)"
+            ContSheet.Range(4, 19, ConLineCount + 3, 19).CopyTo(WSout.Cell(OutBookLineCount + 2, 31)); //Toll(+)
+            ContSheet.Range(4, 20, ConLineCount + 3, 20).CopyTo(WSout.Cell(OutBookLineCount + 2, 32)); //Actual
+            ContSheet.Range(4, 21, ConLineCount + 3, 21).CopyTo(WSout.Cell(OutBookLineCount + 2, 33)); //"Extent Of Variation"
+            ContSheet.Range(4, 22, ConLineCount + 3, 22).CopyTo(WSout.Cell(OutBookLineCount + 2, 34)); //"Comments Short"
+            ContSheet.Range(4, 24, ConLineCount + 3, 24).CopyTo(WSout.Cell(OutBookLineCount + 2, 35)); //"Comments Long"
 
             //clear out the styling mess that came acorss with the abouve
             WSout.ConditionalFormats.RemoveAll();
             foreach (IXLDataValidation val in WSout.DataValidations) { val.Clear(); };
-            WSout.Range(2, 20, ConLineCount + 5, 35).Style = WSout.Cell(1, 1).Style;
+            WSout.CellsUsed().Style = WSout.Cell(1, 1).Style;
         }
 
         // moving the data off the ConDP sheet
-        static void ConSheet(XLWorkbook wb, XLWorkbook wbout, int ConLineCount)
+        static void ConSheet(XLWorkbook wb, XLWorkbook wbout, int ConLineCount, int OutBookLineCount)
         {
             IXLWorksheet WSout = wbout.Worksheets.First();
             IXLWorksheet ConSheet = wb.Worksheet(2);
             string ConSheetName = "Concession or Deviation Permit";
             if (ConSheet.Name != ConSheetName) { throw new ArgumentException("The Con or DP sheet wasnt found"); }
 
-            WSout.Range(2, 1, ConLineCount + 1, 1).Value = ConSheet.Cell(4, 4).Value; //1.1
-            WSout.Range(2, 2, ConLineCount + 1, 2).Value = ConSheet.Cell(6, 3).Value; //1.2
-            WSout.Range(2, 3, ConLineCount + 1, 3).Value = ConSheet.Cell(6, 8).Value; //1.2
-            WSout.Range(2, 4, ConLineCount + 1, 4).Value = ConSheet.Cell(4, 19).Value; //1.3
-            WSout.Range(2, 5, ConLineCount + 1, 5).Value = ConSheet.Cell(6, 20).Value; //1.4
-            WSout.Range(2, 6, ConLineCount + 1, 6).Value = ConSheet.Cell(9, 1).Value; //2.1
-            WSout.Range(2, 7, ConLineCount + 1, 7).Value = ConSheet.Cell(9, 6).Value; //2.2
-            WSout.Range(2, 8, ConLineCount + 1, 8).Value = ConSheet.Cell(11, 6).Value; //2.3
-            WSout.Range(2, 9, ConLineCount + 1, 9).Value = ConSheet.Cell(9, 16).Value; //2.4
-            WSout.Range(2, 10, ConLineCount + 1, 10).Value = ConSheet.Cell(9, 21).Value; //2.5
-            WSout.Range(2, 11, ConLineCount + 1, 11).Value = ConSheet.Cell(11, 16).Value; //2.6
-            WSout.Range(2, 12, ConLineCount + 1, 12).Value = ConSheet.Cell(11, 19).Value; //2.7
-            WSout.Range(2, 13, ConLineCount + 1, 13).Value = ConSheet.Cell(9, 23).Value; //2.8
-            WSout.Range(2, 14, ConLineCount + 1, 14).Value = ConSheet.Cell(11, 23).Value; //2.9
-            WSout.Range(2, 15, ConLineCount + 1, 15).Value = ConSheet.Cell(24, 1).Value; //Previous Subs of a similar
-            WSout.Range(2, 16, ConLineCount + 1, 16).Value = ConSheet.Cell(24, 11).Value; //"Previous Subs to actual"
-            WSout.Range(2, 17, ConLineCount + 1, 17).Value = ConSheet.Cell(26, 1).Value;
-            WSout.Range(2, 18, ConLineCount + 1, 18).Value = ConSheet.Cell(36, 2).Value;
+            WSout.Range(2, 1, ConLineCount + 1 + OutBookLineCount, 1).Value = ConSheet.Cell(4, 4).Value; //1.1
+            WSout.Range(2, 2, ConLineCount + 1 + OutBookLineCount, 2).Value = ConSheet.Cell(6, 3).Value; //1.2
+            WSout.Range(2, 3, ConLineCount + 1 + OutBookLineCount, 3).Value = ConSheet.Cell(6, 8).Value; //1.2
+            WSout.Range(2, 4, ConLineCount + 1 + OutBookLineCount, 4).Value = ConSheet.Cell(4, 19).Value; //1.3
+            WSout.Range(2, 5, ConLineCount + 1 + OutBookLineCount, 5).Value = ConSheet.Cell(6, 20).Value; //1.4
+            WSout.Range(2, 6, ConLineCount + 1 + OutBookLineCount, 6).Value = ConSheet.Cell(9, 1).Value; //2.1
+            WSout.Range(2, 7, ConLineCount + 1 + OutBookLineCount, 7).Value = ConSheet.Cell(9, 6).Value; //2.2
+            WSout.Range(2, 8, ConLineCount + 1 + OutBookLineCount, 8).Value = ConSheet.Cell(11, 6).Value; //2.3
+            WSout.Range(2, 9, ConLineCount + 1 + OutBookLineCount, 9).Value = ConSheet.Cell(9, 16).Value; //2.4
+            WSout.Range(2, 10, ConLineCount + 1 + OutBookLineCount, 10).Value = ConSheet.Cell(9, 21).Value; //2.5
+            WSout.Range(2, 11, ConLineCount + 1 + OutBookLineCount, 11).Value = ConSheet.Cell(11, 16).Value; //2.6
+            WSout.Range(2, 12, ConLineCount + 1 + OutBookLineCount, 12).Value = ConSheet.Cell(11, 19).Value; //2.7
+            WSout.Range(2, 13, ConLineCount + 1 + OutBookLineCount, 13).Value = ConSheet.Cell(9, 23).Value; //2.8
+            WSout.Range(2, 14, ConLineCount + 1 + OutBookLineCount, 14).Value = ConSheet.Cell(11, 23).Value; //2.9
+            WSout.Range(2, 15, ConLineCount + 1 + OutBookLineCount, 15).Value = ConSheet.Cell(24, 1).Value; //Previous Subs of a similar
+            WSout.Range(2, 16, ConLineCount + 1 + OutBookLineCount, 16).Value = ConSheet.Cell(24, 11).Value; //"Previous Subs to actual"
+            WSout.Range(2, 17, ConLineCount + 1 + OutBookLineCount, 17).Value = ConSheet.Cell(26, 1).Value;
+            WSout.Range(2, 18, ConLineCount + 1 + OutBookLineCount, 18).Value = ConSheet.Cell(36, 2).Value;
         }
 
         // Filling in the headers
